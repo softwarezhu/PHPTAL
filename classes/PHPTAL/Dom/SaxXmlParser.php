@@ -446,7 +446,7 @@ class PHPTAL_Dom_SaxXmlParser
         $str = preg_replace_callback("/<\?($types)(.*?)\?>/", array('self', 'convertPHPBlockToTALES'), $str);
 
         // corrects all non-entities and neutralizes potentially problematic CDATA end marker
-        $str = strtr(preg_replace('/&(?!(?:#x?[a-f0-9]+|[a-z][a-z0-9]*);)/i', '&amp;', $str), array('<'=>'&lt;', ']]>'=>']]&gt;'));
+        $str = strtr($str, array('<'=>'&lt;', ']]>'=>']]&gt;'));
 
         return $str;
     }
