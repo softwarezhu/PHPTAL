@@ -23,7 +23,9 @@
         }
     ],
     "require": {
-        "php": ">=5.1.2"
+        "php": ">=5.1.2",
+        "ext-dom": "*",
+        "fluentdom/fluentdom": "^6.0"
     },
     "require-dev": {
         "php": ">=5.3.3",

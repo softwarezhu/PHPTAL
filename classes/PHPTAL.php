@@ -1099,7 +1099,8 @@ class PHPTAL
         $realpath = $this->_source->getRealPath();
         $parser = new PHPTAL_Dom_SaxXmlParser($this->_encoding);
 
-        $builder = new PHPTAL_Dom_PHPTALDocumentBuilder();
+//        $builder = new PHPTAL_Dom_PHPTALDocumentBuilder();
+        $builder = new PHPTAL_Dom_PHPTALNativeBuilder();
         $tree = $parser->parseString($builder, $data, $realpath)->getResult();
 
         foreach($prefilters as $prefilter) {
