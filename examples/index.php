@@ -13,7 +13,7 @@ $time = microtime(true);
 
 $template = new PHPTAL();
 $template->setForceReparse(true);
-$template->setUseNative(false);
+$template->setUseNative(true);
 $template->setSource(file_get_contents('data/preview.html'));
 
 $data_str = <<<EO
