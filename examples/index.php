@@ -8,8 +8,12 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 require '../classes/PHPTAL.php';
+
+$time = microtime(true);
+
 $template = new PHPTAL();
 $template->setForceReparse(true);
+$template->setUseNative(false);
 $template->setSource(file_get_contents('data/preview.html'));
 
 $data_str = <<<EO
@@ -23,13 +27,9 @@ foreach ($data as $k=>$v) {
     $template->set($k, $v);
 }
 $template->set('is_mini', false);
-echo $template->execute();
-
-foreach ($data as $k=>$v) {
-    $template->set($k, $v);
-}
-$template->set('is_mini', false);
 
 $result =  $template->execute();
 
 file_put_contents('result.html', $result);
+
+echo PHP_EOL . '--------' . (microtime(true) - $time) . '---------' . PHP_EOL;

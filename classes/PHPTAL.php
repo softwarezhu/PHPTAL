@@ -167,6 +167,8 @@ class PHPTAL
      * speeds up calls to external templates
      */
     private $externalMacroTemplatesCache = array();
+    
+    protected $useNative = true;
 
     //}}}
 
@@ -1099,8 +1101,11 @@ class PHPTAL
         $realpath = $this->_source->getRealPath();
         $parser = new PHPTAL_Dom_SaxXmlParser($this->_encoding);
 
-//        $builder = new PHPTAL_Dom_PHPTALDocumentBuilder();
-        $builder = new PHPTAL_Dom_PHPTALNativeBuilder();
+        if ($this->useNative) {
+            $builder = new PHPTAL_Dom_PHPTALNativeBuilder();
+        } else {
+            $builder = new PHPTAL_Dom_PHPTALDocumentBuilder();
+        }
         $tree = $parser->parseString($builder, $data, $realpath)->getResult();
 
         foreach($prefilters as $prefilter) {
@@ -1223,5 +1228,10 @@ class PHPTAL
         if ($uses_autoload) {
             spl_autoload_register('__autoload');
         }
+    }
+    
+    public function setUseNative($b)
+    {
+        $this->useNative = $b;
     }
 }

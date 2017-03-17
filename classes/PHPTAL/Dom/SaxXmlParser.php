@@ -106,17 +106,27 @@ class PHPTAL_Dom_SaxXmlParser
      */
     function parseElement(DOMNode $element)
     {
-
-
         $needClose = false;
         if ($element instanceof DOMText) {
             $this->builder->onElementData($element->wholeText);
         } else if ($element instanceof DOMDocumentType) {
-//            $this->builder->onDocType('<!doctype ' . $element->publicId . '>');
+            $docType = '<!doctype ' . $element->name;
+            if ($element->publicId) {
+                $docType .= ' PUBLIC "' . $element->publicId . '"';
+            }
+            if ($element->systemId) {
+                $docType .= ' "' . $element->systemId . '"';
+            }
+            $docType .= '>';
+            $this->builder->onDocType($docType);
         } else if ($element instanceof DOMDocument) {
             // 什么都不做
         } else if ($element instanceof DOMComment) {
             $this->builder->onComment($element->nodeValue);
+        } else if ($element instanceof DOMProcessingInstruction) {
+            // 处理php标记
+            $code = '<?' . $element->target . ' ' . $element->nodeValue . '>';
+            $this->builder->onProcessingInstruction($code);
         } else {
             $needClose = true;
             $attributes = [];
@@ -143,21 +153,41 @@ class PHPTAL_Dom_SaxXmlParser
 
     public function parseString(PHPTAL_Dom_DocumentBuilder $builder, $src, $filename = '<string>')
     {
-        $this->builder = $builder;
-        $dom = new DOMDocument();
-        @$dom->loadHTML($src);
-
         try
         {
+            if ($builder instanceof PHPTAL_Dom_PHPTALNativeBuilder) {
+                $builder->setEncoding($this->input_encoding);
+
+                $builder->onDocumentStart();
+                
+                $this->builder = $builder;
+                $dom = new DOMDocument();
+                @$dom->loadHTML($src);
+
+                $this->parseElement($dom);
+
+                $builder->onDocumentEnd();
+
+                return $builder;
+            }
+
             $builder->setEncoding($this->input_encoding);
+            $this->_file = $filename;
 
+            $this->_line = 1;
+            $state = self::ST_ROOT;
+            $mark  = 0;
+            $len   = strlen($src);
+
+            $quoteStyle = '"';
+            $tagname    = "";
+            $attribute  = "";
+            $attributes = array();
+
+            $customDoctype = false;
+
+            $builder->setSource($this->_file, $this->_line);
             $builder->onDocumentStart();
-
-            $this->parseElement($dom);
-            
-            $builder->onDocumentEnd();
-
-            return $builder;
 
             $i=0;
             // remove BOM (UTF-8 byte order mark)...
