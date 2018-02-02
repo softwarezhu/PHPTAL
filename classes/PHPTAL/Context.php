@@ -350,7 +350,7 @@ class PHPTAL_Context
      * @access private
      * @return mixed
      */
-    public static function path($base, $path, $nothrow=false)
+    public static function path($base, $path, $nothrow=true)
     {
         if ($base === null) {
             if ($nothrow) return null;
